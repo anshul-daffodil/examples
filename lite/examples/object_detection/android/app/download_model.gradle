@@ -1,7 +1,34 @@
+//task downloadModelFile(type: Download) {
+//    src 'https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/2?lite-format=tflite'
+//    dest project.ext.ASSET_DIR + '/detect.tflite'
+//    overwrite false
+//}
+//
+//preBuild.dependsOn downloadModelFile
+
 task downloadModelFile(type: Download) {
-    src 'https://tfhub.dev/tensorflow/lite-model/ssd_mobilenet_v1/1/metadata/2?lite-format=tflite'
+    if (file("$rootProject.projectDir/model.properties").exists()) {
+        def props = new Properties()
+        file("$rootProject.projectDir/model.properties").withInputStream { props.load(it) }
+        src props.getProperty("MODEL_FILE")
+    } else {
+        src ''
+    }
     dest project.ext.ASSET_DIR + '/detect.tflite'
-    overwrite false
+    overwrite true
+}
+
+task downloadLabelFile(type: Download) {
+    if (file("$rootProject.projectDir/model.properties").exists()) {
+        def props = new Properties()
+        file("$rootProject.projectDir/model.properties").withInputStream { props.load(it) }
+        src props.getProperty("LABELMAP_FILE")
+    } else {
+        src ''
+    }
+    dest project.ext.ASSET_DIR + '/labelmap.txt'
+    overwrite true
 }
 
 preBuild.dependsOn downloadModelFile
+downloadModelFile.dependsOn downloadLabelFile

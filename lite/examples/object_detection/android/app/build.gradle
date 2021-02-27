@@ -13,10 +13,26 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    defaultConfig {
+        if (file("$rootProject.projectDir/model.properties").exists()) {
+            def props = new Properties()
+            file("$rootProject.projectDir/model.properties").withInputStream { props.load(it) }
+            buildConfigField 'int', 'MODEL_INPUT_SIZE', props.getProperty('MODEL_INPUT_SIZE')
+            buildConfigField 'boolean', 'IS_MODEL_QUANTIZED', props.getProperty('IS_MODEL_QUANTIZED')
+
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (file("$rootProject.projectDir/model.properties").exists()) {
+                def props = new Properties()
+                file("$rootProject.projectDir/model.properties").withInputStream { props.load(it) }
+                buildConfigField 'int', 'MODEL_INPUT_SIZE', props.getProperty('LABELMAP_FILE')
+                buildConfigField 'bool', 'IS_MODEL_QUANTIZED', props.getProperty('LABELMAP_FILE')
+
+            }
         }
     }
     aaptOptions {
